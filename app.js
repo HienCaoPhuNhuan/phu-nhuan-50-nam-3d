@@ -1,0 +1,25 @@
+const meanings=[
+{title:'Số 50 cách điệu',short:'Số 50',symbol:'50',category:'HÀNH TRÌNH',description:'Hành trình 50 năm phát triển và cống hiến.'},
+{title:'Chữ “Năm” & lá vàng',short:'Chữ “Năm”',symbol:'Năm',category:'DẤU ẤN',description:'Điểm nhấn trang trọng, giàu xúc cảm.'},
+{title:'Cột mốc 1976 – 2026',short:'1976 – 2026',symbol:'50',category:'LỊCH SỬ',description:'Dấu ấn lịch sử 50 năm tự hào.'},
+{title:'Huy hiệu trường',short:'Huy hiệu',symbol:'PN',category:'BẢN SẮC',description:'Huy hiệu đặt ở vị trí số 0, lấy bản sắc và giá trị cốt lõi làm trọng tâm.'},
+{title:'Vòng tròn',short:'Vòng tròn',symbol:'◎',category:'GẮN KẾT',description:'Sự đoàn kết, tiếp nối bền chặt qua các thế hệ.'},
+{title:'Ngọn đuốc đỏ',short:'Ngọn đuốc',symbol:'♨',category:'TRI THỨC',description:'Ánh sáng tri thức, nhiệt huyết và lý tưởng cao đẹp.'},
+{title:'Cuốn sách mở',short:'Cuốn sách',symbol:'▱',category:'HIẾU HỌC',description:'Tinh thần hiếu học, tìm tòi và đổi mới sáng tạo.'},
+{title:'Ký hiệu 24–11',short:'24–11',symbol:'24·11',category:'TRUYỀN THỐNG',description:'Ngày truyền thống của nhà trường.'},
+{title:'Chữ P – N',short:'P – N',symbol:'PN',category:'NHẬN DIỆN',description:'Dấu ấn nhận diện thương hiệu THPT Phú Nhuận.'},
+{title:'Dải lụa xanh',short:'Dải lụa',symbol:'≈',category:'TIẾP NỐI',description:'Dòng chảy tiếp nối truyền thống và khát vọng vươn xa.'},
+{title:'Hai nhánh lá vàng',short:'Nhánh lá',symbol:'❧',category:'TRI ÂN',description:'Thành tựu, vinh quang và tấm lòng tri ân.'},
+{title:'Màu xanh dương',short:'Xanh dương',symbol:'◈',category:'NIỀM TIN',description:'Tri thức, niềm tin và chiều sâu truyền thống.'},
+{title:'Màu vàng ánh kim',short:'Vàng ánh kim',symbol:'✧',category:'TỰ HÀO',description:'Sự cao quý, trang trọng và niềm tự hào.'},
+{title:'Màu đỏ & trắng',short:'Đỏ & trắng',symbol:'✦',category:'TUỔI HỌC TRÒ',description:'Ngọn lửa nhiệt huyết và sự trong sáng của tuổi học trò.'}
+];
+const $=id=>document.getElementById(id), viewer=$('trophy');let active=0,paused=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const topicButtons=meanings.map((m,i)=>{const b=document.createElement('button');b.textContent=m.short;b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',()=>selectMeaning(i));$('topics').append(b);return b});
+meanings.forEach((m,i)=>{const d=document.createElement('details'),s=document.createElement('summary'),n=document.createElement('span'),t=document.createElement('span'),plus=document.createElement('span'),p=document.createElement('p');n.className='item-number';n.textContent=String(i+1).padStart(2,'0');t.textContent=m.title;plus.className='item-plus';plus.textContent='+';plus.setAttribute('aria-hidden','true');s.append(n,t,plus);p.textContent=m.description;d.append(s,p);if(i===0)d.open=true;$('meaning-list').append(d)});
+function selectMeaning(i){active=(i+meanings.length)%meanings.length;const m=meanings[active];$('meaning-title').textContent=m.title;$('meaning-description').textContent=m.description;$('meaning-category').textContent=m.category;$('meaning-symbol').textContent=m.symbol;$('meaning-count').textContent=`${String(active+1).padStart(2,'0')} / 14`;topicButtons.forEach((b,j)=>b.setAttribute('aria-pressed',String(j===active)));const strip=$('topics'),button=topicButtons[active];strip.scrollTo({left:button.offsetLeft-strip.offsetLeft-strip.clientWidth/2+button.clientWidth/2,behavior:paused?'instant':'smooth'});const panel=document.querySelector('.meaning-panel');panel.classList.remove('changing');void panel.offsetWidth;panel.classList.add('changing')}
+function setPaused(value){paused=value;viewer.toggleAttribute('auto-rotate',!paused);document.body.classList.toggle('motion-paused',paused);$('motion').setAttribute('aria-pressed',String(paused));$('motion-icon').textContent=paused?'▷':'Ⅱ';$('motion-label').textContent=paused?'Tiếp tục xoay':'Dừng xoay'}
+$('previous').addEventListener('click',()=>selectMeaning(active-1));$('next').addEventListener('click',()=>selectMeaning(active+1));$('motion').addEventListener('click',()=>setPaused(!paused));$('reset').addEventListener('click',()=>{setPaused(true);viewer.cameraOrbit='0deg 82deg 105%';viewer.resetTurntableRotation?.(0);viewer.jumpCameraToGoal?.()});
+$('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if($('stage').requestFullscreen)await $('stage').requestFullscreen();else{$('stage').classList.toggle('expanded')}}catch{}});
+viewer.addEventListener('load',()=>{$('loading').hidden=true;$('model-error').hidden=true;document.body.dataset.modelLoaded='true'});viewer.addEventListener('error',()=>{$('loading').hidden=true;$('model-error').hidden=false;document.body.dataset.modelLoaded='error'});$('retry').addEventListener('click',()=>{$('model-error').hidden=true;$('loading').hidden=false;viewer.src=`assets/cup.glb?retry=${Date.now()}`});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)viewer.removeAttribute('auto-rotate');else if(!paused)viewer.setAttribute('auto-rotate','')});setPaused(paused);

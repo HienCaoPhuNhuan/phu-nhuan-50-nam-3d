@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071a35">
+<title>50 năm THPT Phú Nhuận · Dấu ấn tự hào</title>
+<meta name="description" content="Không gian trưng bày cúp 3D kỷ niệm 50 năm Trường THPT Phú Nhuận, 1976–2026. Tri ân quá khứ – Kiến tạo tương lai – Vững bước vươn xa.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="style.css">
+<script type="module" src="assets/model-viewer.min.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><div class="aurora"></div><div class="beam"></div><div class="stars"></div><svg class="ribbons" viewBox="0 0 1440 900" preserveAspectRatio="none"><path d="M-100 830 C250 400 460 1000 850 700 S1250 500 1540 640"/><path d="M-100 860 C250 430 460 1030 850 730 S1250 530 1540 670"/><path d="M-100 880 C250 450 460 1050 850 750 S1250 550 1540 690"/></svg></div>
+<header class="header"><a class="brand" href="#" aria-label="THPT Phú Nhuận — Trang đầu"><span class="brand-mark">PN<span>50</span></span><span>TRƯỜNG THPT PHÚ NHUẬN<small>HÀNH TRÌNH 1976 — 2026</small></span></a><nav aria-label="Điều hướng"><a href="#trung-bay" class="nav-active">Không gian 3D</a><a href="#y-nghia">Câu chuyện logo <span>↗</span></a></nav><span class="edition">DẤU ẤN NỬA THẾ KỶ</span></header>
+<main>
+<section class="exhibition" id="trung-bay" aria-labelledby="page-title">
+<div class="intro"><p class="eyebrow"><span></span> KỶ NIỆM 50 NĂM NGÀY TRUYỀN THỐNG</p><h1 id="page-title">Nửa thế kỷ.<br> <em>Một niềm tự hào.</em></h1><p class="intro-copy">Tri thức được thắp sáng. Truyền thống được tiếp nối.<br>Khát vọng vươn xa được trao qua từng thế hệ.</p></div>
+<div class="gallery">
+<aside class="milestone"><span class="small-label">HÀNH TRÌNH CỐNG HIẾN</span><div class="years">1976<span>—</span>2026</div><div class="gold-line"></div><p>Năm mươi năm<br>vun bồi tri thức,<br>kết nối những tự hào.</p><a class="story-link" href="#y-nghia">Khám phá biểu tượng <span>↓</span></a></aside>
+<div class="stage" id="stage"><div class="orbit orbit-one" aria-hidden="true"></div><div class="orbit orbit-two" aria-hidden="true"></div><div class="halo" aria-hidden="true"></div><div class="pedestal" aria-hidden="true"></div>
+<model-viewer id="trophy" src="assets/cup.glb" alt="Mô hình cúp 50 năm THPT Phú Nhuận, mặt xanh viền vàng, thân và đế vàng" camera-controls auto-rotate rotation-per-second="18deg" auto-rotate-delay="900" camera-orbit="-12deg 82deg 105%" min-camera-orbit="auto 55deg 80%" max-camera-orbit="auto 100deg 160%" field-of-view="32deg" shadow-intensity="1" shadow-softness=".9" exposure="1.25" environment-image="neutral" interaction-prompt="none" touch-action="pan-y" loading="eager" reveal="auto"><div slot="progress-bar" class="loading" id="loading"><span class="loading-ring"></span><span>Đang mở không gian 3D…</span></div></model-viewer>
+<div class="model-error" id="model-error" hidden><img src="assets/cup-poster.png" alt="Ảnh mẫu cúp 50 năm"><p>Chưa tải được mô hình 3D.</p><button id="retry">Thử lại</button></div>
+<div class="viewer-controls"><button id="motion" aria-pressed="false"><span id="motion-icon">Ⅱ</span><span id="motion-label">Dừng xoay</span></button><button id="reset"><span>↺</span> Góc chính diện</button><button id="fullscreen" aria-label="Xem cúp toàn màn hình" title="Toàn màn hình">⛶</button></div><p class="drag-hint"><span>⤢</span> Kéo để xoay · Cuộn hoặc chụm để phóng to</p>
+</div>
+<aside class="meaning-panel" aria-live="polite" aria-atomic="true" aria-labelledby="meaning-title"><div class="panel-top"><span class="small-label">GIẢI MÃ BIỂU TƯỢNG</span><span id="meaning-count">01 / 14</span></div><div class="meaning-symbol" aria-hidden="true" id="meaning-symbol">50</div><p class="meaning-category" id="meaning-category">HÀNH TRÌNH</p><h2 id="meaning-title">Số 50 cách điệu</h2><p class="meaning-description" id="meaning-description">Hành trình 50 năm phát triển và cống hiến.</p><div class="meaning-bottom"><span class="panel-rule"></span><button id="previous" aria-label="Ý nghĩa trước">←</button><button id="next" aria-label="Ý nghĩa tiếp theo">→</button></div></aside>
+</div>
+<div class="topic-bar"><span class="small-label">CHẠM ĐỂ KHÁM PHÁ</span><div class="topics" id="topics" role="group" aria-label="Các chi tiết logo"></div></div>
+<a class="scroll-cue" href="#y-nghia">CÂU CHUYỆN PHÍA SAU LOGO <span>↓</span></a>
+</section>
+<section class="story" id="y-nghia" aria-labelledby="story-title"><div class="story-heading"><p class="eyebrow">BẢN SẮC · TRUYỀN THỐNG · KHÁT VỌNG</p><h2 id="story-title">Mỗi đường nét,<br><em>một câu chuyện.</em></h2><p>Từ ngọn đuốc tri thức đến dải lụa tiếp nối — mỗi chi tiết cùng tạo nên dấu ấn 50 năm Trường THPT Phú Nhuận.</p></div><div class="meaning-list" id="meaning-list"></div></section>
+<section class="closing" aria-label="Thông điệp kỷ niệm"><p class="eyebrow">THPT PHÚ NHUẬN · 1976 — 2026</p><p class="motto">Tri ân quá khứ.<br>Kiến tạo tương lai.<br><em>Vững bước vươn xa.</em></p><span class="closing-date">24.11.1976 — 24.11.2026</span><a href="#trung-bay" class="back-top">Trở lại không gian trưng bày ↑</a></section>
+</main><footer><span>TRƯỜNG THPT PHÚ NHUẬN</span><span>50 năm phát triển & cống hiến</span><span>1976 — 2026</span></footer>
+</body></html>
+
