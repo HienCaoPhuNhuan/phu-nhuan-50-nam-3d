@@ -12,22 +12,3 @@
 .ignition{width:150px;height:150px;background:radial-gradient(circle,rgba(255,250,213,.95),rgba(255,221,131,.65) 9%,rgba(255,154,40,.22) 30%,transparent 68%);box-shadow:none!important}
 .arrival-flash{height:70px;background:radial-gradient(ellipse,rgba(255,238,185,.25),rgba(255,178,67,.08) 30%,transparent 68%);box-shadow:none;filter:blur(3px)}.arrival-flash::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent 5%,rgba(255,204,109,.2) 25%,rgba(255,244,207,.8) 50%,rgba(255,204,109,.2) 75%,transparent 95%)}
 .display-ring{border:0;background:radial-gradient(ellipse,transparent 48%,rgba(230,196,117,.03) 60%,rgba(230,196,117,.16) 68%,rgba(230,196,117,.025) 77%,transparent 86%);box-shadow:none;filter:blur(1.5px)}
-
-#sound-control {
- position: fixed;
- right: max(14px, env(safe-area-inset-right));
- bottom: max(14px, env(safe-area-inset-bottom));
- z-index: 5;
- min-height: 40px;
- padding: 8px 14px;
- border: 1px solid #efd49452;
- border-radius: 999px;
- background: #071628dc;
- color: #f2dda9;
- font: inherit;
- font-size: 12px;
- cursor: pointer;
-}
-#sound-control:hover { border-color: #efd494; }
-#sound-control:focus-visible { outline: 2px solid #efd494; outline-offset: 3px; }
-#sound-control:disabled { cursor: wait; }

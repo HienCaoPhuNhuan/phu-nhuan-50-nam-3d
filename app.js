@@ -58,123 +58,84 @@ function updateRotationSpeed() {
 }
 
 function draw(now){if(document.hidden){raf=0;return}if(!start)start=now;const elapsed=(now-start)/1000,p=elapsed/10,dt=Math.min((now-(previous||now))/1000,.05);previous=now;ctx.clearRect(-offsetX,-offsetY,viewportWidth,viewportHeight);if(!reduced){energy(p,elapsed);flames(p,elapsed);emit(p,dt);ctx.globalCompositeOperation='lighter';particles=particles.filter(s=>s.life<s.max).slice(-900);for(const s of particles){s.life+=dt;s.x+=s.vx*dt+Math.sin(elapsed*3+s.wobble)*dt*8;s.y+=s.vy*dt;if(s.burst){s.vy+=75*dt;s.vx*=Math.exp(-.35*dt)}const a=Math.sin(Math.PI*clamp(s.life/s.max))*(1-.65*clamp((p-.9)/.22));ctx.strokeStyle=`rgba(${s.color},${a})`;ctx.lineWidth=s.size;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-s.vx*.015,s.y-s.vy*.035+3+s.size*2);ctx.stroke()}ctx.globalCompositeOperation='source-over'}if(p>.68)document.body.classList.add('illuminated');if(p>=1&&!completed)finish();if(completed&&!reduced)updateRotationSpeed();raf=requestAnimationFrame(draw)}
-function finish(){if(completed)return;completed=true;document.body.classList.remove('revealing');document.body.classList.add('revealed','illuminated');document.body.dataset.phase='rotation';document.body.dataset.revealDuration=String(REVEAL_MS);soundEnabled=false;refreshSoundButton();if(!reduced)viewer.setAttribute('auto-rotate','');if(reduced){cancelAnimationFrame(raf);ctx.clearRect(-offsetX,-offsetY,viewportWidth,viewportHeight)}}
+function finish(){if(completed)return;completed=true;document.body.classList.remove('revealing');document.body.classList.add('revealed','illuminated');document.body.dataset.phase='rotation';document.body.dataset.revealDuration=String(REVEAL_MS);currentCue=null;if(!reduced)viewer.setAttribute('auto-rotate','');if(reduced){cancelAnimationFrame(raf);ctx.clearRect(-offsetX,-offsetY,viewportWidth,viewportHeight)}}
 function begin(){if(started||!modelReady||!textReady)return;started=true;resize();document.body.dataset.phase='reveal';document.body.classList.add('revealing');playCue('fire');start=performance.now();previous=start;raf=requestAnimationFrame(draw)}
 function ready(){modelReady=true;begin()}
 viewer.addEventListener('load',ready);viewer.addEventListener('error',()=>{document.getElementById('fallback').hidden=false;document.getElementById('model-reveal').hidden=true;ready()});
-// Four lines arrive first. Start each sound at the same point as its visual phase.
-const soundButton = document.getElementById('sound-control');
-const introReady = Promise.all([document.fonts.ready, new Promise(resolve => requestAnimationFrame(resolve))]);
-let textTimer;
-let soundEnabled = false;
+// Keep sound cues on the visual timeline even if the browser unlocks audio late.
 let audioContext;
 let audioOutput;
 let audioBuffers;
-let activeCue;
+let currentCue;
+let playingCue;
+let activeSource;
 
-function refreshSoundButton() {
- soundButton.textContent = soundEnabled ? 'Tắt âm thanh' : 'Phát với âm thanh';
-}
-
-function stopCue() {
- if (!activeCue) return;
- activeCue.stop();
- activeCue = null;
+function startCurrentCue() {
+ if (!currentCue || playingCue === currentCue || !audioBuffers || audioContext.state !== 'running') return;
+ const buffer = audioBuffers[currentCue.name];
+ const offset = (performance.now() - currentCue.startedAt) / 1000;
+ if (offset >= buffer.duration) return;
+ if (activeSource) activeSource.stop();
+ const source = audioContext.createBufferSource();
+ source.buffer = buffer;
+ source.connect(audioOutput);
+ source.onended = () => {
+  source.disconnect();
+  if (activeSource === source) activeSource = null;
+ };
+ activeSource = source;
+ playingCue = currentCue;
+ source.start(0, offset);
 }
 
 function playCue(name) {
- if (!soundEnabled || !audioBuffers) return;
- stopCue();
- const cue = audioContext.createBufferSource();
- cue.buffer = audioBuffers[name];
- cue.connect(audioOutput);
- cue.onended = () => {
-  cue.disconnect();
-  if (activeCue === cue) activeCue = null;
- };
- activeCue = cue;
- cue.start();
+ currentCue = { name, startedAt: performance.now() };
+ startCurrentCue();
 }
 
 async function prepareSound() {
- if (!audioContext) {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioContext = new AudioContext();
-  audioOutput = audioContext.createGain();
-  audioOutput.gain.value = document.hidden ? 0 : .85;
-  audioOutput.connect(audioContext.destination);
- }
- await audioContext.resume();
- if (!audioBuffers) {
-  const decode = async path => {
-   const response = await fetch(path);
-   if (!response.ok) throw new Error('Could not load sound effect');
-   return audioContext.decodeAudioData(await response.arrayBuffer());
-  };
-  const [light, fire] = await Promise.all([
-   decode('assets/text-light.wav'),
-   decode('assets/trophy-fire.wav'),
-  ]);
-  audioBuffers = { light, fire };
- }
+ const AudioContext = window.AudioContext || window.webkitAudioContext;
+ if (!AudioContext) return;
+ audioContext = new AudioContext();
+ audioOutput = audioContext.createGain();
+ audioOutput.gain.value = document.hidden ? 0 : .85;
+ audioOutput.connect(audioContext.destination);
+ audioContext.addEventListener('statechange', startCurrentCue);
+
+ const resumeSound = () => {
+  if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+ };
+ // Some browsers require an interaction before audio can start.
+ document.addEventListener('click', resumeSound, {capture:true});
+ document.addEventListener('keydown', resumeSound, {capture:true});
+ resumeSound();
+
+ const decode = async path => {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error('Could not load sound effect');
+  return audioContext.decodeAudioData(await response.arrayBuffer());
+ };
+ const [light, fire] = await Promise.all([
+  decode('assets/text-light.wav'),
+  decode('assets/trophy-fire.wav'),
+ ]);
+ audioBuffers = { light, fire };
+ startCurrentCue();
 }
 
 function playTextIntro() {
  document.body.dataset.phase = 'text';
  document.body.classList.add('lettering');
  playCue('light');
- textTimer = setTimeout(() => {
+ setTimeout(() => {
   textReady = true;
   document.body.classList.add('text-ready');
   begin();
  }, 4300);
 }
 
-function restartIntro() {
- clearTimeout(textTimer);
- cancelAnimationFrame(raf);
- stopCue();
- viewer.removeAttribute('auto-rotate');
- viewer.resetTurntableRotation?.(0);
- if (viewer.getCameraOrbit) {
-  viewer.cameraOrbit = '0deg 83deg 105%';
-  viewer.jumpCameraToGoal();
- }
- viewer.rotationPerSecond = '16deg';
- started = false;
- completed = false;
- textReady = false;
- start = previous = spawnCredit = bursts = 0;
- particles = [];
- ctx.clearRect(-offsetX, -offsetY, viewportWidth, viewportHeight);
- document.body.classList.remove('lettering', 'text-ready', 'revealing', 'revealed', 'illuminated');
- // Flush the class change so the CSS animations restart on this click.
- void document.body.offsetWidth;
- playTextIntro();
-}
-
-introReady.then(playTextIntro);
-soundButton.addEventListener('click', async () => {
- if (soundEnabled) {
-  soundEnabled = false;
-  stopCue();
-  refreshSoundButton();
-  return;
- }
- soundButton.disabled = true;
- soundButton.textContent = 'Đang tải âm thanh…';
- try {
-  await Promise.all([prepareSound(), introReady]);
-  soundEnabled = true;
-  restartIntro();
-  refreshSoundButton();
- } catch (error) {
-  console.warn('Không thể bật âm thanh.', error);
-  soundButton.textContent = 'Thử bật âm thanh';
- } finally {
-  soundButton.disabled = false;
- }
-});
+prepareSound().catch(error => console.warn('Không thể tải âm thanh.', error));
+Promise.all([document.fonts.ready, new Promise(resolve => requestAnimationFrame(resolve))]).then(playTextIntro);
 document.addEventListener('visibilitychange', () => {
  if (audioOutput) audioOutput.gain.value = document.hidden ? 0 : .85;
 });
