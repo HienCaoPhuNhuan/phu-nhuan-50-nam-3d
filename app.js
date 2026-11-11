@@ -45,7 +45,19 @@ function energy(p,t){
  }
 }
 
-function draw(now){if(document.hidden){raf=0;return}if(!start)start=now;const elapsed=(now-start)/1000,p=elapsed/10,dt=Math.min((now-(previous||now))/1000,.05);previous=now;ctx.clearRect(-offsetX,-offsetY,viewportWidth,viewportHeight);if(!reduced){energy(p,elapsed);flames(p,elapsed);emit(p,dt);ctx.globalCompositeOperation='lighter';particles=particles.filter(s=>s.life<s.max).slice(-900);for(const s of particles){s.life+=dt;s.x+=s.vx*dt+Math.sin(elapsed*3+s.wobble)*dt*8;s.y+=s.vy*dt;if(s.burst){s.vy+=75*dt;s.vx*=Math.exp(-.35*dt)}const a=Math.sin(Math.PI*clamp(s.life/s.max))*(1-.65*clamp((p-.9)/.22));ctx.strokeStyle=`rgba(${s.color},${a})`;ctx.lineWidth=s.size;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-s.vx*.015,s.y-s.vy*.035+3+s.size*2);ctx.stroke()}ctx.globalCompositeOperation='source-over'}if(p>.68)document.body.classList.add('illuminated');if(p>=1&&!completed)finish();raf=requestAnimationFrame(draw)}
+function updateRotationSpeed() {
+ const baseSpeed = 16;
+ const rearBoost = 6;
+ // The model's front points toward the camera at zero orbit and zero yaw.
+ const angleToCamera = viewer.getCameraOrbit().theta - viewer.turntableRotation;
+ const rear = clamp(-Math.cos(angleToCamera));
+ const easedRear = rear * rear * (3 - 2 * rear);
+ const speed = Math.round((baseSpeed + rearBoost * easedRear) * 4) / 4;
+ const rate = speed + 'deg';
+ if (viewer.rotationPerSecond !== rate) viewer.rotationPerSecond = rate;
+}
+
+function draw(now){if(document.hidden){raf=0;return}if(!start)start=now;const elapsed=(now-start)/1000,p=elapsed/10,dt=Math.min((now-(previous||now))/1000,.05);previous=now;ctx.clearRect(-offsetX,-offsetY,viewportWidth,viewportHeight);if(!reduced){energy(p,elapsed);flames(p,elapsed);emit(p,dt);ctx.globalCompositeOperation='lighter';particles=particles.filter(s=>s.life<s.max).slice(-900);for(const s of particles){s.life+=dt;s.x+=s.vx*dt+Math.sin(elapsed*3+s.wobble)*dt*8;s.y+=s.vy*dt;if(s.burst){s.vy+=75*dt;s.vx*=Math.exp(-.35*dt)}const a=Math.sin(Math.PI*clamp(s.life/s.max))*(1-.65*clamp((p-.9)/.22));ctx.strokeStyle=`rgba(${s.color},${a})`;ctx.lineWidth=s.size;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-s.vx*.015,s.y-s.vy*.035+3+s.size*2);ctx.stroke()}ctx.globalCompositeOperation='source-over'}if(p>.68)document.body.classList.add('illuminated');if(p>=1&&!completed)finish();if(completed&&!reduced)updateRotationSpeed();raf=requestAnimationFrame(draw)}
 function finish(){if(completed)return;completed=true;document.body.classList.remove('revealing');document.body.classList.add('revealed','illuminated');document.body.dataset.phase='rotation';document.body.dataset.revealDuration=String(REVEAL_MS);if(!reduced)viewer.setAttribute('auto-rotate','');if(reduced){cancelAnimationFrame(raf);ctx.clearRect(-offsetX,-offsetY,viewportWidth,viewportHeight)}}
 function begin(){if(started||!modelReady||!textReady)return;started=true;resize();document.body.dataset.phase='reveal';document.body.classList.add('revealing');start=performance.now();previous=start;raf=requestAnimationFrame(draw);document.getElementById('model-reveal').addEventListener('animationend',e=>{if(e.target.id==='model-reveal')finish()},{once:true})}
 function ready(){modelReady=true;begin()}
