@@ -6,4 +6,4 @@ Bốn dòng chữ hiện lần lượt với ánh sáng vàng trong khoảng 4,3
 
 Chạy thử: `py -m http.server 8765`, mở http://localhost:8765.
 
-Mô hình: `assets/cup.glb`, bản 02 dựng theo tư liệu TVC, kích thước ước lượng. model-viewer 4.1.0 (Apache-2.0); Be Vietnam Pro và Noto Serif (OFL); giấy phép trong assets. Tài nguyên tải từ cùng website. GitHub Actions tự triển khai Pages khi push main.
+Mô hình: `assets/cup.glb`, dựng theo ảnh trước và sau trong TVC/Draft. Đường bao, họa tiết và chữ lấy từ ảnh mặt trước. Mặt lưng dùng vật liệu vàng phản chiếu dựa theo ảnh sau. Độ dày và kích thước là ước lượng. model-viewer 4.1.0 (Apache-2.0); Be Vietnam Pro và Noto Serif (OFL); giấy phép trong assets. Tài nguyên tải từ cùng website. GitHub Actions tự triển khai Pages khi push main.
